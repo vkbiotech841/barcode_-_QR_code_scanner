@@ -13,76 +13,103 @@ import { BehaviorSubject } from 'rxjs';
 export class AppComponent {
   title = 'barcode-scanner';
 
-  availableDevices: MediaDeviceInfo[];
+  availableDevices: MediaDeviceInfo[];     // The MediaDevicesInfo interface contains information that describes a single media input or output device. 
   currentDevice: MediaDeviceInfo = null;
-
-  formatsEnabled: BarcodeFormat[] = [
-    BarcodeFormat.CODE_128,
-    BarcodeFormat.DATA_MATRIX,
-    BarcodeFormat.EAN_13,
-    BarcodeFormat.QR_CODE,
-  ];
-
   hasDevices: boolean;
   hasPermission: boolean;
-
   qrResultString: string;
-
   torchEnabled = false;
-  torchAvailable$ = new BehaviorSubject<boolean>(false);
   tryHarder = false;
+
+
+  // List of enabled BarcodeFormates
+  // formatsEnabled: BarcodeFormat[] = Object.keys(BarcodeFormat).map(key => BarcodeFormat[key]);
+  formatsEnabled: BarcodeFormat[] = [
+    BarcodeFormat.AZTEC,
+    BarcodeFormat.CODABAR,
+    BarcodeFormat.CODE_128,
+    BarcodeFormat.CODE_39,
+    BarcodeFormat.CODE_93,
+    BarcodeFormat.DATA_MATRIX,
+    BarcodeFormat.EAN_13,
+    BarcodeFormat.EAN_8,
+    BarcodeFormat.ITF,
+    BarcodeFormat.MAXICODE,
+    BarcodeFormat.PDF_417,
+    BarcodeFormat.QR_CODE,
+    BarcodeFormat.RSS_14,
+    BarcodeFormat.RSS_EXPANDED,
+    BarcodeFormat.UPC_A,
+    BarcodeFormat.UPC_E,
+    BarcodeFormat.UPC_EAN_EXTENSION,
+  ]
+
+
+  torchAvailable$ = new BehaviorSubject<boolean>(false);
 
   constructor(private readonly _dialog: MatDialog) { }
 
-  clearResult(): void {
-    this.qrResultString = null;
-  }
 
+  // searching for camara and setting
   onCamerasFound(devices: MediaDeviceInfo[]): void {
     this.availableDevices = devices;
     this.hasDevices = Boolean(devices && devices.length);
   }
 
-  onCodeResult(resultString: string) {
-    this.qrResultString = resultString;
-  }
-
+  // This method selects camara if available
   onDeviceSelectChange(selected: string) {
     const device = this.availableDevices.find(x => x.deviceId === selected);
     this.currentDevice = device || null;
   }
 
+  // This method checks, if camara has been given a permission.
+  onHasPermission(has: boolean) {
+    this.hasPermission = has;
+  }
+
+  // This method is to display (dialog), whether this device has a camara and permission. Actually it asks for permission
+  openInfoDialog() {
+    const data = {
+      hasDevices: this.hasDevices,
+      hasPermission: this.hasPermission,
+    };
+    this._dialog.open(AppInfoDialogComponent, { data });
+  }
+
+  // Checks if camara is compatable.
+  onTorchCompatible(isCompatible: boolean): void {
+    this.torchAvailable$.next(isCompatible || false);
+  }
+
+  // This methods toggles between camara and no camara. 
+  toggleTorch(): void {
+    this.torchEnabled = !this.torchEnabled;
+  }
+
+  // This methods display which formats are enabled. Also it opens FormatsDialgComponent (sibling, used as entry component.)
   openFormatsDialog() {
     const data = {
       formatsEnabled: this.formatsEnabled,
     };
-
     this._dialog
       .open(FormatsDialogComponent, { data })
       .afterClosed()
       .subscribe(x => { if (x) { this.formatsEnabled = x; } });
   }
 
-  onHasPermission(has: boolean) {
-    this.hasPermission = has;
+
+  // qrCode result as string:
+  onCodeResult(resultString: string) {
+    this.qrResultString = resultString;
   }
 
-  openInfoDialog() {
-    const data = {
-      hasDevices: this.hasDevices,
-      hasPermission: this.hasPermission,
-    };
 
-    this._dialog.open(AppInfoDialogComponent, { data });
+  // clearing qr code result
+  clearResult(): void {
+    this.qrResultString = null;
   }
 
-  onTorchCompatible(isCompatible: boolean): void {
-    this.torchAvailable$.next(isCompatible || false);
-  }
 
-  toggleTorch(): void {
-    this.torchEnabled = !this.torchEnabled;
-  }
 
   toggleTryHarder(): void {
     this.tryHarder = !this.tryHarder;

@@ -1,14 +1,30 @@
 import { BarcodeFormat } from '@zxing/library';
 
+// BarcodeFormate is class that Enumerates barcode formats known to this package.
+// It comes under zxing/library.
+
+// export const formatsAvailable = Object.keys(BarcodeFormat).map(key => BarcodeFormat[key]);
 export const formatsAvailable = [
+    BarcodeFormat.AZTEC,
+    BarcodeFormat.CODABAR,
     BarcodeFormat.CODE_128,
+    BarcodeFormat.CODE_39,
+    BarcodeFormat.CODE_93,
     BarcodeFormat.DATA_MATRIX,
     BarcodeFormat.EAN_13,
     BarcodeFormat.EAN_8,
     BarcodeFormat.ITF,
+    BarcodeFormat.MAXICODE,
+    BarcodeFormat.PDF_417,
     BarcodeFormat.QR_CODE,
     BarcodeFormat.RSS_14,
+    BarcodeFormat.RSS_EXPANDED,
+    BarcodeFormat.UPC_A,
+    BarcodeFormat.UPC_E,
+    BarcodeFormat.UPC_EAN_EXTENSION
 ];
+
+
 
 export const formatNames = [
     'Aztec 2D barcode format.',
